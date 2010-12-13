@@ -19,11 +19,8 @@ describe Gabba::Gabba do
 
   describe "when tracking page views" do
     before do
-      stub_analytics "utmac=abc&utmcc=&utmcs=UTF-8&utmdt=title&utmhid=6783939397&utmhn=123&utmn=1009731272&utmp=/page/path&utmul=en-us&utmwv=4.4sh"
-
-      @gabba = Gabba::Gabba.new("abc", "123")
-      @gabba.utmn = "1009731272"
-      @gabba.utmcc = ''
+      stub_analytics "utmac=UC-123&utmcc=&utmcs=UTF-8&utmdt=title&utmhid=6783939397&utmhn=domain&utmn=1009731272&utmp=/page/path&utmul=en-us&utmwv=4.4sh"
+      @gabba = Gabba::Gabba.new("UC-123", "domain", :utmn => "1009731272", :utmcc => '')
     end
 
     it "must do a request to google" do
@@ -33,11 +30,8 @@ describe Gabba::Gabba do
 
   describe "when tracking custom events" do
     before do
-      stub_analytics "utmac=abc&utmcc=&utmcs=UTF-8&utme=5(cat1*action*lab1)(val1)&utmhid=6783939397&utmhn=123&utmn=1009731272&utmt=event&utmul=en-us&utmwv=4.4sh"
-
-      @gabba = Gabba::Gabba.new("abc", "123")
-      @gabba.utmn = "1009731272"
-      @gabba.utmcc = ''
+      stub_analytics "utmac=UC-123&utmcc=&utmcs=UTF-8&utme=5(cat1*action*lab1)(val1)&utmhid=6783939397&utmhn=domain&utmn=1009731272&utmt=event&utmul=en-us&utmwv=4.4sh"
+      @gabba = Gabba::Gabba.new("UC-123", "domain", :utmn => "1009731272", :utmcc => '')
     end
 
     it "must do a request to google" do

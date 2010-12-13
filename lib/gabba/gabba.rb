@@ -16,17 +16,18 @@ module Gabba
 
     attr_accessor :utmwv, :utmn, :utmhn, :utmcs, :utmul, :utmdt, :utmp, :utmac, :utmt, :utmcc, :user_agent
 
-    def initialize(ga_acct, domain, agent = Gabba::USER_AGENT)
+    def initialize(ga_acct, domain, opts = {})
       @utmwv = "4.4sh" # GA version
       @utmcs = "UTF-8" # charset
       @utmul = "en-us" # language
 
       @utmn = rand(8999999999) + 1000000000
-      @utmhid = rand(8999999999) + 1000000000
 
       @utmac = ga_acct
       @utmhn = domain
-      @user_agent = agent
+      @user_agent = Gabba::USER_AGENT
+
+      opts.each {|key, value| self.send("#{key}=", value) }
     end
 
     def page_view(title, page, utmhid = rand(8999999999) + 1000000000)
@@ -42,24 +43,17 @@ module Gabba
     private
 
     def page_view_params(title, page, utmhid)
-      { :utmwv => @utmwv,
-        :utmn => @utmn,
-        :utmhn => @utmhn,
-        :utmcs => @utmcs,
-        :utmul => @utmul,
-        :utmdt => title,
-        :utmhid => utmhid,
-        :utmp => page,
-        :utmac => @utmac,
-        :utmcc => @utmcc || cookie_params }
+      default_params(utmhid).merge(:utmdt => title, :utmp => page)
     end
 
     def event_params(category, action, label, value, utmhid)
+      default_params(utmhid).merge(:utmt => 'event', :utme => event_data(category, action, label, value))
+    end
+
+    def default_params(utmhid)
       { :utmwv => @utmwv,
         :utmn => @utmn,
         :utmhn => @utmhn,
-        :utmt => 'event',
-        :utme => event_data(category, action, label, value),
         :utmcs => @utmcs,
         :utmul => @utmul,
         :utmhid => utmhid,
