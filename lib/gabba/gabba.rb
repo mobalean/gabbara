@@ -38,7 +38,7 @@ module Gabba
       @user_agent = request.env["HTTP_USER_AGENT"] || Gabba::USER_AGENT
       @utmhn ||= request.env["SERVER_NAME"] || ""
       @utmr = request.params['utmr'].blank? ? (request.env['HTTP_REFERER'].blank? ? "-" : request.env['HTTP_REFERER']) : request.params[:utmr]
-      @utmp = request.params['utmp'] || ""
+      @utmp = request.params['utmp'].blank? ? (request.env['REQUEST_URI'] || "") : request.params['utmp']
       # the last octect of the IP address is removed to anonymize the user.
       @utmip = IPAddr.new(request.env["REMOTE_ADDR"]).mask(24).to_s
     end
