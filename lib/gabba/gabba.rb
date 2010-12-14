@@ -2,11 +2,12 @@
 require "uri"
 require "net/http"
 require 'cgi'
+require 'ipaddr'
+require 'active_support/core_ext/array/extract_options'
 
 module Gabba
 
-  class NoGoogleAnalyticsAccountError < RuntimeError; end
-  class NoGoogleAnalyticsDomainError < RuntimeError; end
+  class GoogleAnalyticsSetupError < RuntimeError; end
   class GoogleAnalyticsNetworkError < RuntimeError; end
 
   class Gabba
@@ -14,51 +15,71 @@ module Gabba
     BEACON_PATH = "/__utm.gif"
     USER_AGENT = "Gabba #{VERSION} Agent"
 
-    attr_accessor :utmwv, :utmn, :utmhn, :utmcs, :utmul, :utmdt, :utmp, :utmac, :utmt, :utmcc, :user_agent
+    attr_accessor :utmwv, :utmn, :utmhn, :utmcs, :utmul, :utmp, :utmac, :utmt, :utmcc, :utmr, :utmip, :user_agent
 
-    def initialize(ga_acct, domain, opts = {})
+    # create with:
+    #  ga_acct, domain
+    # or
+    #  ga_acct, :request => request
+    def initialize(ga_acct, *args)
       @utmwv = "4.4sh" # GA version
       @utmcs = "UTF-8" # charset
       @utmul = "en-us" # language
-
       @utmn = rand(8999999999) + 1000000000
-
-      @utmac = ga_acct
-      @utmhn = domain
       @user_agent = Gabba::USER_AGENT
 
+      @utmac = ga_acct
+      opts = args.extract_options!
+      @utmhn = args.shift
       opts.each {|key, value| self.send("#{key}=", value) }
     end
 
-    def page_view(title, page, utmhid = rand(8999999999) + 1000000000)
-      check_account_params
-      hey(page_view_params(title, page, utmhid))
+    def request=(request)
+      @user_agent = request.env["HTTP_USER_AGENT"] || Gabba::USER_AGENT
+      @utmhn ||= request.env["SERVER_NAME"] || ""
+      @utmr = request.params['utmr'].blank? ? (request.env['HTTP_REFERER'].blank? ? "-" : request.env['HTTP_REFERER']) : request.params[:utmr]
+      @utmp = request.params['utmp'] || ""
+      # the last octect of the IP address is removed to anonymize the user.
+      @utmip = IPAddr.new(request.env["REMOTE_ADDR"]).mask(24).to_s
     end
 
-    def event(category, action, label = nil, value = nil, utmhid = rand(8999999999) + 1000000000)
+    # parameters:
+    #  title, page, :utmvid => visitor_id
+    # or
+    #  title, :utmvid => visitor_id
+    # if page is obmitted, it is taken from the request
+    def page_view(title, *args)
       check_account_params
-      hey(event_params(category, action, label, value, utmhid))
+      opts = args.extract_options!
+      opts[:utmdt] = title
+      opts[:utmp] = args.shift || @utmp
+      hey(opts)
+    end
+
+    # parameters:
+    #  category, action, label = nil, value = nil, :utmvid => visitor_id
+    def event(*args)
+      check_account_params
+      opts = args.extract_options!
+      opts[:utmt] = 'event'
+      opts[:utme] = event_data(*args)
+      hey(opts)
     end
 
     private
 
-    def page_view_params(title, page, utmhid)
-      default_params(utmhid).merge(:utmdt => title, :utmp => page)
-    end
-
-    def event_params(category, action, label, value, utmhid)
-      default_params(utmhid).merge(:utmt => 'event', :utme => event_data(category, action, label, value))
-    end
-
-    def default_params(utmhid)
+    def default_params
       { :utmwv => @utmwv,
         :utmn => @utmn,
         :utmhn => @utmhn,
         :utmcs => @utmcs,
         :utmul => @utmul,
-        :utmhid => utmhid,
+        :utmhid => rand(8999999999) + 1000000000,
         :utmac => @utmac,
-        :utmcc => @utmcc || cookie_params }
+        :utmcc => @utmcc || cookie_params,
+        :utmr => @utmr,
+        :utmp => @utmp,
+        :utmip => @utmip }
     end
 
     def event_data(category, action, label = nil, value = nil)
@@ -73,23 +94,20 @@ module Gabba
 
     # sanity check that we have needed params to even call GA
     def check_account_params
-      raise NoGoogleAnalyticsAccountError unless @utmac
-      raise NoGoogleAnalyticsDomainError unless @utmhn
+      raise GoogleAnalyticsSetupError, "no account" unless @utmac
+      raise GoogleAnalyticsSetupError, "no domain" unless @utmhn
     end
 
     # makes the tracking call to Google Analytics
-    def hey(params, referer = "-")
+    def hey(params)
       headers = {"User-Agent" => URI.escape(user_agent)}
-      req = Net::HTTP::Get.new("#{BEACON_PATH}?#{hash_to_querystring(params)}", headers)
+      params = default_params.merge(params).reject{|k,v| v.blank? }
+      query = params.map {|k,v| "#{k}=#{CGI.escape(v.to_s)}" }.join('&')
+      req = Net::HTTP::Get.new("#{BEACON_PATH}?#{query}", headers)
       res = Net::HTTP.start(GOOGLE_HOST) do |http|
         http.request(req)
       end
       raise GoogleAnalyticsNetworkError unless res.code == "200"
-    end
-
-    # convert params hash to query string
-    def hash_to_querystring(hash = {})
-      hash.map {|key, value| "#{key.to_s}=#{CGI.escape(value.to_s)}" }.join('&')
     end
   end
 end
