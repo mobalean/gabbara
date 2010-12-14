@@ -66,7 +66,7 @@ describe Gabba::Gabba do
     user_agent = args.shift || 'Gabba%200.0.1%20Agent'
     expected_params = { "utmac"=>"UC-123", "utmcs"=>"UTF-8", "utmhid"=>"6783939397", "utmhn"=>"domain", "utmn"=>"1009731272", "utmul"=>"en-us", "utmwv"=>"4.4sh" }.merge(expected_params).reject{|k,v| v.blank? }
     query = expected_params.map {|k,v| "#{k}=#{CGI.escape(v.to_s)}" }.join('&')
-    s = stub_request(:get, "http://http//www.google-analytics.com:80/__utm.gif?#{query}").
+    s = stub_request(:get, "http://www.google-analytics.com:80/__utm.gif?#{query}").
       with(:headers => {'Accept'=>'*/*', 'User-Agent'=>user_agent}).
       to_return(:status => 200, :body => "", :headers => {})
     #puts s.request_pattern

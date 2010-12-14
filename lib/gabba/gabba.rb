@@ -11,7 +11,7 @@ module Gabba
   class GoogleAnalyticsNetworkError < RuntimeError; end
 
   class Gabba
-    GOOGLE_HOST = "http://www.google-analytics.com"
+    GOOGLE_HOST = "www.google-analytics.com"
     BEACON_PATH = "/__utm.gif"
     USER_AGENT = "Gabba #{VERSION} Agent"
 
