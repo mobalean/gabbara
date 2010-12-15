@@ -15,7 +15,7 @@ module Gabba
     BEACON_PATH = "/__utm.gif"
     USER_AGENT = "Gabba #{VERSION} Agent"
 
-    attr_accessor :utmwv, :utmn, :utmhn, :utmcs, :utmul, :utmp, :utmac, :utmt, :utmcc, :utmr, :utmip, :user_agent
+    attr_accessor :logger, :utmwv, :utmn, :utmhn, :utmcs, :utmul, :utmp, :utmac, :utmt, :utmcc, :utmr, :utmip, :user_agent
 
     # create with:
     #  ga_acct, domain
@@ -102,6 +102,7 @@ module Gabba
     def hey(params)
       headers = {"User-Agent" => URI.escape(user_agent)}
       params = default_params.merge(params).reject{|k,v| v.blank? }
+      logger.info("GA: #{params.inspect}") if logger
       query = params.map {|k,v| "#{k}=#{CGI.escape(v.to_s)}" }.join('&')
       req = Net::HTTP::Get.new("#{BEACON_PATH}?#{query}", headers)
       res = Net::HTTP.start(GOOGLE_HOST) do |http|
