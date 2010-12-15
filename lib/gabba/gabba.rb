@@ -94,8 +94,8 @@ module Gabba
 
     # sanity check that we have needed params to even call GA
     def check_account_params
-      raise GoogleAnalyticsSetupError, "no account" unless @utmac
-      raise GoogleAnalyticsSetupError, "no domain" unless @utmhn
+      raise GoogleAnalyticsSetupError, "no account" if @utmac.blank?
+      raise GoogleAnalyticsSetupError, "no domain" if @utmhn.blank?
     end
 
     # makes the tracking call to Google Analytics
