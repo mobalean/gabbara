@@ -1,7 +1,8 @@
 PATH
   remote: .
   specs:
-    gabba (0.0.1)
+    gabbara (0.0.2)
+      activesupport
 
 GEM
   remote: http://rubygems.org/
@@ -28,7 +29,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
-  gabba!
+  gabbara!
   rack
   rspec
   webmock

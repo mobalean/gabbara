@@ -6,4 +6,3 @@ gemspec
 gem "rspec"
 gem "webmock"
 gem "rack"
-gem "activesupport"
