@@ -5,7 +5,7 @@ require 'cgi'
 require 'ipaddr'
 require 'active_support/core_ext/array/extract_options'
 
-module Gabba
+module Gabbara
 
   class GoogleAnalyticsSetupError < RuntimeError; end
   class GoogleAnalyticsNetworkError < RuntimeError; end
@@ -13,7 +13,7 @@ module Gabba
   class Gabba
     GOOGLE_HOST = "www.google-analytics.com"
     BEACON_PATH = "/__utm.gif"
-    USER_AGENT = "Gabba #{VERSION} Agent"
+    USER_AGENT = "Gabbara #{VERSION} Agent"
 
     attr_accessor :logger, :utmwv, :utmn, :utmhn, :utmcs, :utmul, :utmp, :utmac, :utmt, :utmcc, :utmr, :utmip, :user_agent
 

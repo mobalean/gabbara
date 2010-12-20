@@ -2,11 +2,13 @@
 
 Heavily influenced by the http://code.google.com/p/serversidegoogleanalytics
 
+Based on deadprogrammer's gabba (https://github.com/hybridgroup/gabba)
+
 HOW TO USE:
 
 - Track page views
-Gabba::Gabba.new("UT-1234", "mydomain.com").page_view("something", "track/me")
+Gabbara::Gabba.new("UT-1234", "mydomain.com").page_view("something", "track/me")
 
 - Track custom events
-Gabba::Gabba.new("UT-1234", "mydomain.com").event("Videos", "Play", "ID", "123")
+Gabbara::Gabba.new("UT-1234", "mydomain.com").event("Videos", "Play", "ID", "123")
 
