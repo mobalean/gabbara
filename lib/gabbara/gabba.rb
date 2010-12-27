@@ -83,7 +83,7 @@ module Gabbara
     end
 
     def event_data(category, action, label = nil, value = nil)
-      "5(#{category}*action".tap do |data|
+      "5(#{category}*#{action}".tap do |data|
         data << "*#{label}" if label
         data << ")"
         data << "(#{value})" if value
