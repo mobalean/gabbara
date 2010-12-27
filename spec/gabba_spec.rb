@@ -50,7 +50,40 @@ describe Gabbara::Gabba do
     end
   end
 
-  describe "when tracking custom events" do
+  describe "when tracking custom events with two params" do
+    before do
+      stub_analytics "utme"=>"5(cat1*action)", "utmt"=>"event"
+      @gabba = Gabbara::Gabba.new("UC-123", "domain", :utmn => "1009731272", :utmcc => '')
+    end
+
+    it "must do a request to google" do
+      @gabba.event("cat1", "act1", :utmhid => "6783939397")
+    end
+  end
+
+  describe "when tracking custom events with label without value" do
+    before do
+      stub_analytics "utme"=>"5(cat1*action*lab1)", "utmt"=>"event"
+      @gabba = Gabbara::Gabba.new("UC-123", "domain", :utmn => "1009731272", :utmcc => '')
+    end
+
+    it "must do a request to google" do
+      @gabba.event("cat1", "act1", "lab1", :utmhid => "6783939397")
+    end
+  end
+
+  describe "when tracking custom events with value without label" do
+    before do
+      stub_analytics "utme"=>"5(cat1*action)(val1)", "utmt"=>"event"
+      @gabba = Gabbara::Gabba.new("UC-123", "domain", :utmn => "1009731272", :utmcc => '')
+    end
+
+    it "must do a request to google" do
+      @gabba.event("cat1", "act1", nil, "val1", :utmhid => "6783939397")
+    end
+  end
+
+  describe "when tracking custom events with all params" do
     before do
       stub_analytics "utme"=>"5(cat1*action*lab1)(val1)", "utmt"=>"event"
       @gabba = Gabbara::Gabba.new("UC-123", "domain", :utmn => "1009731272", :utmcc => '')
