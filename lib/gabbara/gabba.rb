@@ -15,7 +15,19 @@ module Gabbara
     BEACON_PATH = "/__utm.gif"
     USER_AGENT = "Gabbara #{VERSION} Agent"
 
-    attr_accessor :logger, :utmwv, :utmn, :utmhn, :utmcs, :utmul, :utmp, :utmac, :utmt, :utmcc, :utmr, :utmip, :user_agent
+    attr_accessor :logger, 
+      :utmwv,  # GA version, default: "4.4sh"
+      :utmn,   # random
+      :utmhn,  # domain
+      :utmcs,  # charset, default: "UTF-8"
+      :utmul,  # language, default: "en-us"
+      :utmhid, # Session ID
+      :utmp,   # path
+      :utmac,  # account ID
+      :utmcc,  # utm cookies from client
+      :utmr,   # referrer, default: params['utmr'] or HTTP_REFERER or -
+      :utmip,  # client IP 
+      :user_agent
 
     # create with:
     #  ga_acct, domain
@@ -74,7 +86,7 @@ module Gabbara
         :utmhn => @utmhn,
         :utmcs => @utmcs,
         :utmul => @utmul,
-        :utmhid => rand(8999999999) + 1000000000,
+        :utmhid => @utmhid || rand(8999999999) + 1000000000, # TODO don't use random
         :utmac => @utmac,
         :utmcc => @utmcc || cookie_params,
         :utmr => @utmr,
@@ -90,7 +102,7 @@ module Gabbara
       end
     end
 
-    # create magical cookie params used by GA for its own nefarious purposes
+    # TODO don't use random
     def cookie_params(utma1 = rand(89999999) + 10000000, utma2 = rand(1147483647) + 1000000000, today = Time.now)
       "__utma=1.#{utma1}00145214523.#{utma2}.#{today.to_i}.#{today.to_i}.15;+__utmz=1.#{today.to_i}.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none);"
     end
