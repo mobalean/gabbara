@@ -1,13 +1,13 @@
 PATH
   remote: .
   specs:
-    gabbara (0.0.4)
+    gabbara (0.0.5)
       activesupport
 
 GEM
   remote: http://rubygems.org/
   specs:
-    activesupport (3.0.3)
+    activesupport (3.0.5)
     addressable (2.2.2)
     crack (0.1.8)
     diff-lcs (1.1.2)
