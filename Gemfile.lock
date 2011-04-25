@@ -28,7 +28,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activesupport
   gabbara!
   rack
   rspec
