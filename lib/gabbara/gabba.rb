@@ -117,7 +117,7 @@ module Gabbara
     def hey(params)
       headers = {"User-Agent" => URI.escape(user_agent)}
       params = default_params.merge(params).reject{|k,v| v.blank? }
-      logger.info("GA: #{params.inspect}") if logger
+      logger.debug("GA: #{params.inspect}") if logger
       query = params.map {|k,v| "#{k}=#{CGI.escape(v.to_s)}" }.join('&')
       req = Net::HTTP::Get.new("#{BEACON_PATH}?#{query}", headers)
       res = Net::HTTP.start(GOOGLE_HOST) do |http|
